@@ -7,13 +7,10 @@ const { Search } = Input
 
 const iconStyle = {
     color: '#FFFFFF',
-    fontSize: '30px',
-    display: 'block',
-    marginLeft: '20px',
-    paddingTop: '15px'
+    fontSize: '40px'
 }
 
-const MyLayout = () => {
+const MyLayout = ({children}) => {
 
     const isLogin = false
 
@@ -28,11 +25,15 @@ const MyLayout = () => {
         setSearch(e.target.value)
     }
 
+    const handleLogout = () => {
+
+    }
+
     const userDropDown = () => {
         return (
             <Menu>
                 <Menu.Item>
-                    <a onClick={handleloginout}>登 出</a>
+                    <a onClick={handleLogout}>登 出</a>
                 </Menu.Item>
             </Menu>
         )
@@ -79,7 +80,7 @@ const MyLayout = () => {
             </Header>
 
             <Content>
-
+                {children}
             </Content>
 
             <Footer>
@@ -92,12 +93,18 @@ const MyLayout = () => {
                 }
                 .header-left {
                     display: flex;
+                    align-items: center;
                 }
-                .search {
-                    padding-top: 15px;
+                .logo {
+                    height: 45px;
+                    margin-left: 40px;
+                    margin-right:40px;
+                }
+                .search{
+                    height: 32px;
                 }
                 .header-right {
-                    margin-right: 20px;
+                    margin-right:40px;
                 }
             `}</style>
             <style jsx global>

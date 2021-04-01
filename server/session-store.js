@@ -1,6 +1,9 @@
 const getRedisSessionId = sid => `ssid:${sid}`
 
 /**
+ * 
+ * 将session存储在redis中
+ *
  * redis管理
  */
 class RedisSessionStore {
@@ -18,7 +21,7 @@ class RedisSessionStore {
     async set(sid, sess, ttl) {
         const id = getRedisSessionId(sid)
         if (typeof ttl == 'number') {
-            ttl = Math.cell(ttl / 1000)
+            ttl = Math.ceil(ttl / 1000)
         }
         try {
             const sessStr = JSON.stringify(sess)
@@ -55,7 +58,7 @@ class RedisSessionStore {
      * 
      * @param {参数id} sid 
      */
-    async destory(sid) {
+    async destroy(sid) {
         const id = getRedisSessionId(sid)
         try {
             await this.redisClient.del(id)
