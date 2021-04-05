@@ -7,6 +7,7 @@ const dev = process.env.NODE_ENV !== 'production'
 const app = next({dev})
 const handle = app.getRequestHandler()
 const auth = require('./server/auth')
+const api = require('./server/api')
 
 const RedisSessionStore = require('./server/session-store')
 const redis = new Redis()
@@ -26,7 +27,9 @@ app.prepare().then(() => {
 
     server.use(session(SESSION_CONFIG, server))
     auth(server)
+    api(server)
     server.use(async (ctx, next) => {
+        ctx.req.session = ctx.session
         // nextjs不仅兼容koa，所以使用原生的response和request对象，
         await handle(ctx.req, ctx.res)
         // respond是koa内置的response处理，如不使用可以设置ctx.responde = false

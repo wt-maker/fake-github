@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { Layout, Input, Dropdown, Avatar, Menu, Tooltip } from 'antd'
+import { withRouter } from 'next/router'
 import { GithubOutlined } from '@ant-design/icons'
+import { connect } from 'react-redux'
+import { logout } from '../store/store'
 const { Header, Content, Footer } = Layout
 const { Search } = Input
 
@@ -10,23 +13,26 @@ const iconStyle = {
     fontSize: '40px'
 }
 
-const MyLayout = ({children}) => {
+const MyLayout = ({children, user, logout, router}) => {
 
-    const isLogin = false
+    let isLogin = false
+    if (user && user.id) {
+        isLogin = true
+    }
 
     const [search, setSearch] = useState()
 
-    const handleOnSearch = () => {
-        console.log("search")
-    }
+    const handleOnSearch = useCallback(() => {
+        router.push(`search?query=${search}`)
+    }, [search])
 
-    const handleOnChange = (e) => {
-        console.log(e.target.value)
+    const handleOnChange = useCallback((e) => {
         setSearch(e.target.value)
-    }
+    }, [])
 
-    const handleLogout = () => {
-
+    const handleLogout = (e) => {
+        logout()
+        e.preventDefault()
     }
 
     const userDropDown = () => {
@@ -64,7 +70,7 @@ const MyLayout = ({children}) => {
                             {isLogin ? (
                                 <Dropdown overlay={userDropDown}>
                                     <a href="/">
-                                        <Avatar size={40} src="https://avatars.githubusercontent.com/u/52414106"></Avatar>
+                                        <Avatar size={40} src={user.avatar_url}></Avatar>
                                     </a>
                                 </Dropdown>
                             ) : (
@@ -127,5 +133,14 @@ const MyLayout = ({children}) => {
         </Layout >
     )
 }
-
-export default MyLayout
+const mapStateToProps = (state) => {
+    return {
+        user: state.user
+    }
+}
+const mapReducerToProps = (dispatch) => {
+    return {
+        logout: ()=>dispatch(logout())
+    }
+}
+export default connect(mapStateToProps, mapReducerToProps)(withRouter(MyLayout))

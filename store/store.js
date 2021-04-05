@@ -33,4 +33,18 @@ const initializeStore = (state) => {
     return store
 }
 
+export const logout = () => {
+    return dispatch => {
+        axios.post('/logout').then(res => {
+            if (res.status == 200) {
+                dispatch(logoutActionCreator())
+            } else {
+                console.log('logout failed', res)
+            }
+        }).catch( err => {
+            console.log('logout failed', err)
+        })
+    }
+}
+
 export default initializeStore

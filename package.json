@@ -18,6 +18,8 @@
     "koa": "^2.13.1",
     "koa-router": "^10.0.0",
     "koa-session": "^6.1.0",
+    "lru-cache": "^6.0.0",
+    "moment": "^2.29.1",
     "next": "10.0.9",
     "react": "17.0.1",
     "react-dom": "17.0.1",
