@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { Layout, Input, Dropdown, Avatar, Menu, Tooltip } from 'antd'
 import { withRouter } from 'next/router'
-import { GithubOutlined } from '@ant-design/icons'
+import { GithubOutlined, UserOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
 import { logout } from '../store/store'
 const { Header, Content, Footer } = Layout
@@ -76,7 +76,7 @@ const MyLayout = ({children, user, logout, router}) => {
                             ) : (
                                     <Tooltip>
                                         <a href="/">
-                                            <Avatar size={40} icon="user"></Avatar>
+                                            <Avatar size={40} icon={<UserOutlined />}></Avatar>
                                         </a>
                                     </Tooltip>
                             )}

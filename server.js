@@ -8,9 +8,12 @@ const app = next({dev})
 const handle = app.getRequestHandler()
 const auth = require('./server/auth')
 const api = require('./server/api')
+const atob = require('atob')
 
 const RedisSessionStore = require('./server/session-store')
 const redis = new Redis()
+
+global.atob = atob
 
 const PORT = 3031
 app.prepare().then(() => {

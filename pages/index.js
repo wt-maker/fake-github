@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react'
-import Router from 'next/router'
+import Router, { withRouter } from 'next/router'
 import { connect } from 'react-redux'
 import { Button, Tabs } from 'antd'
 import { request } from '../lib/api'
@@ -13,7 +13,13 @@ const cache = new LRU({
 
 const isServer = typeof window === 'undefined'
 
-const Index = ({user, userRepos, userStarRepos}) => {
+const Index = ({user, userRepos, userStarRepos, router}) => {
+
+  const key = router.query.key || '1'
+
+  const handleTabChange = (key) => {
+    Router.push(`/?key=${key}`)
+  }
 
   useEffect(() => {
     if(!isServer) {
@@ -55,18 +61,18 @@ const Index = ({user, userRepos, userStarRepos}) => {
         <span className="location">{user.location}</span>
       </div>
       <div className="user-repos">
-        <Tabs>
+        <Tabs activeKey={key}  onChange={handleTabChange}>
           <Tabs.TabPane tab="你的仓库" key="1">
             {userRepos.map(repo => {
               return (
-                <Repo repo={repo} key={repo.full_name}></Repo>
+                <Repo repo={repo} key={repo.id}></Repo>
               )
             })}
             </Tabs.TabPane>
             <Tabs.TabPane tab="关注仓库" key="2">
             {userStarRepos.map(repo => {
               return (
-                <Repo repo={repo} key={repo.full_name}></Repo>
+                <Repo repo={repo} key={repo.id}></Repo>
               )
             })}
           </Tabs.TabPane>
@@ -115,7 +121,6 @@ Index.getInitialProps = async({ctx, reduxStore}) => {
     }
   }
   if(!isServer) {
-    console.log('服务端使用缓存')
     if (cache.get('userRepos') && cache.get('userStarRepos')) {
       return {
         userRepos: cache.get('userRepos'),
@@ -123,8 +128,6 @@ Index.getInitialProps = async({ctx, reduxStore}) => {
       }
     }
   }
-
-  console.log('客户端请求数据')
 
   const userRepos = await request({url: '/user/repos'}, ctx.req, ctx.res)
   const userStarRepos = await request({url: '/user/starred'}, ctx.req, ctx.res)
@@ -140,4 +143,4 @@ const mapStateToProps = (state) => {
     user: state.user
   }
 }
-export default connect(mapStateToProps)(Index)
+export default withRouter(connect(mapStateToProps)(Index))

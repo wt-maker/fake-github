@@ -83,12 +83,23 @@ const Search = ({ repos, router }) => {
                         bordered
                         header={<span className="list-header">排序</span>}
                         style={{ marginBottom: 20 }}
-                        dataSource={LANGUAGE}
+                        dataSource={SORT_TYPE}
                         renderItem={
                             item => {
+                                console.log(sort, order)
+                                let selected = false
+                                if (item.name === 'Best Match' && !sort) {
+                                    selected = true
+                                } else if (item.value === sort && item.order === order ) {
+                                    selected = true
+                                }
                                 return (
                                     <List.Item>
-                                        {item}
+                                        {selected? (
+                                            <span>{item.name}</span>
+                                        ): (
+                                            <FilterLink {...router.query} name={item.name} sort={item.value} order={item.order}></FilterLink>
+                                        )}
                                     </List.Item>
                                 )
                             }
@@ -111,11 +122,27 @@ const Search = ({ repos, router }) => {
                             const name = type === 'page' ? page : originalElement
                             return <FilterLink {...router.query} page={p} name={name}></FilterLink>
                         }}
-                    >
-
-                    </Pagination>
+                    />
                 </div>
             </Row>
+            <style jsx>{`
+                .root {
+                    padding: 20px 0;
+                }
+                .list-header {
+                    font-weight: 800;
+                    font-size: 16px;
+                }
+                .repos-title {
+                    border-bottom: 1px solid #eee;
+                    font-size: 24px;
+                    line-height: 50px;
+                }
+                .pagination {
+                    padding: 20px;
+                    text-align: center;
+                }
+            `}</style>
         </div>
     )
 }
@@ -140,7 +167,6 @@ Search.getInitialProps = async ({ ctx }) => {
         ctx.req,
         ctx.res
     )
-    console.log(searchRepos)
     return {
         repos: searchRepos.data
     }
