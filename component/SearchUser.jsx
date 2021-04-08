@@ -10,7 +10,7 @@ function SearchUser({ onChange, value }) {
     const [fetching, setFetching] = useState(false)
     const [options, setOptions] = useState([])
 
-    const fetchUser = async (value) => {
+    const fetchUser = useCallback(debounce(async(value) => {
         setFetching(true)
 
         if (!value) {
@@ -26,6 +26,12 @@ function SearchUser({ onChange, value }) {
         }))
         setFetching(false)
         setOptions(data)
+    }, 500), [])
+
+    const handleChange = (value) => {
+        setFetching(false)
+        setOptions([])
+        onChange(value)
     }
 
     return (
@@ -37,8 +43,9 @@ function SearchUser({ onChange, value }) {
             onSearch={fetchUser}
             filterOption={false}
             allowClear={true}
-            onSearch={fetchUser}
             notFoundContent={fetching ? <Spin size="small" /> : <span>nothing</span>}
+            onSearch={fetchUser}
+            onChange={handleChange}
         >
             {options.map(op => (
                 <Option value={op.value} key={op.value}>

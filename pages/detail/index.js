@@ -1,16 +1,16 @@
 import { request } from '../../lib/api'
-import MarkdownRenderer from '../../component/MarkdownRenderer'
 import WithRepoBasic from '../../component/WithRepoBasic'
-const { readmeData } = require('./testdata')
+import dynamic from 'next/dynamic'
+
+const MarkdownRenderer = dynamic(() => import('../../component/MarkdownRenderer'),{
+    loading: ()=> (<p>Loading</p>)
+}) 
 const Detail = ({ readme }) => {
     return (
         <MarkdownRenderer content={readme.content} isBase64={readme.encoding==='base64'}/>
     )
 }
 
-const fakeReadme = {
-    data: readmeData
-}
 
 Detail.getInitialProps = async ({ ctx: { query: { owner, name }, req, res } }) => {
 
@@ -19,7 +19,6 @@ Detail.getInitialProps = async ({ ctx: { query: { owner, name }, req, res } }) =
         req,
         res
     )
-    // const readmeRes = fakeReadme
 
     return {
         readme: readmeRes.data

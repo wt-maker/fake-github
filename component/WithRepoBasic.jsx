@@ -1,11 +1,12 @@
+import { useEffect } from 'react'
 import { withRouter } from 'next/router'
 import Repo from '../component/Repo'
 import { request } from '../lib/api'
 import Link from 'next/link'
-const { repoBasicData } = require('../pages/detail/testdata')
-const basicRepoInfoFake = {
-    data: repoBasicData
-}
+
+import {cache, get} from '../lib/repo-basic-cache'
+
+const isServer = typeof window === 'undefined'
 
 function makeQuery(queryObject) {
     const query = Object.entries(queryObject)
@@ -22,6 +23,10 @@ const WithRepoBasic = (Comp, type = 'index') => {
     const withDetail = ({ basicRepoInfo, router, ...rest }) => {
         
         const query = makeQuery(router.query)
+
+        useEffect(() => {
+            !isServer && cache(basicRepoInfo)
+        }, [])
         return (
             <div className="root">
                 <div className="repo-basic">
@@ -82,7 +87,17 @@ const WithRepoBasic = (Comp, type = 'index') => {
         if (Comp.getInitialProps) {
             pageData = await Comp.getInitialProps(ctx)
         }
+        const full_name = `${query.owner}/${query.name}`
 
+        if (get(full_name)) {
+            console.log('使用缓存')
+            return {
+                basicRepoInfo: get(full_name),
+                ...pageData
+            }
+        }
+
+        console.log('请求数据')
         const basicRepoInfo = await request(
             {url: `/repos/${query.owner}/${query.name}`},
             ctx.ctx.req,

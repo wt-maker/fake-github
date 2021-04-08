@@ -1,12 +1,17 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import WithRepoBasic from '../../component/WithRepoBasic'
 import { Button, Avatar, Select, Spin } from 'antd'
 import { request } from '../../lib/api'
-import MarkdownRenderer from '../../component/MarkdownRenderer'
 import { getLastUpdated } from '../../lib/utils'
 import SearchUser from '../../component/SearchUser'
+import dynamic from 'next/dynamic'
 
-const { issuesFakeData, labelFakeData, readmeData } = require('./testdata')
+const MarkdownRenderer = dynamic(()=>import('../../component/MarkdownRenderer'), {
+    loading: ()=><p>Loading</p>
+})
+
+const CACHE = {}
+const isServer = typeof window === 'undefined'
 
 const IssueDetail = ({ issue }) => {
     return (
@@ -64,6 +69,11 @@ const IssueItem = ({ issue }) => {
                     type="primary"
                     size="small"
                     onClick={toogleShowDetail}
+                    style={{
+                        position: 'absolute',
+                        top: 10,
+                        right: 10
+                    }}
                 >
                     {showDetail ? '隐藏' : '显示'}
                 </Button>
@@ -142,6 +152,10 @@ const Issues = ({ owner, name, issuesData, labelsData }) => {
     const [creator, setCreator] = useState()
     const [issues, setIssues] = useState(issuesData)
 
+    useEffect(() => {
+        !isServer && (CACHE[`${owner}/${name}`] = labelsData)
+    }, [owner, name, labelsData])
+
     const handleLabelChange = useCallback((value) => {
         setLabel(value)
     }, [])
@@ -154,9 +168,17 @@ const Issues = ({ owner, name, issuesData, labelsData }) => {
         setCreator(value)
     })
 
-    const handleSearch = () => {
+    const handleSearch = useCallback(() => {
 
-    }
+        setFetching(true)
+        request({url: `/repos/${owner}/${name}/issues${makeQuery(creator, state, label)}`}).then(res =>{
+            setIssues(res.data)
+        }).catch(err => {
+            console.log(err)
+        }).finally(()=>{
+            setFetching(false)
+        })
+    }, [owner, name, creator, state, label])
 
     return (
         <div className="root">
@@ -196,7 +218,7 @@ const Issues = ({ owner, name, issuesData, labelsData }) => {
                 </div>
             ) : (
                     <div className="issues">
-                        {issuesData.map(issue => (
+                        {issues.map(issue => (
                             <IssueItem issue={issue} key={issue.id}></IssueItem>
                         ))}
                     </div>
@@ -210,6 +232,7 @@ const Issues = ({ owner, name, issuesData, labelsData }) => {
                 }
                 .search {
                     display: flex;
+                    margin-bottom: 20px;
                 }
                 .loading {
                     height: 400px;
@@ -227,19 +250,39 @@ Issues.getInitialProps = async (ctx) => {
     let { owner, name } = query
 
     //issues
-    const issuesData = await request(
+    /* const issuesData = await request(
         { url: `/repos/${owner}/${name}/issues` },
         req,
         res
     )
-    //const issuesData = issuesFakeData
+    let labelsData = {data: {}}
+    if (CACHE[`${owner}/${name}`]) {
+        console.log(CACHE[`${owner}/${name}`])
+        console.log('使用缓存')
+        labelsData.data = CACHE[`${owner}/${name}`]
+    } else {
+        console.log('请求数据')
+        labelsData = await request(
+            { url: `/repos/${owner}/${name}/labels` },
+            req,
+            res
+        )
+    } */
 
-    const labelsData = await request(
-        { url: `/repos/${owner}/${name}/labels` },
-        req,
-        res
-    )
-    //const labelsData = labelFakeData
+    const fetchs = await Promise.all([
+        await request(
+            { url: `/repos/${owner}/${name}/issues` },
+            req,
+            res
+        ),
+        CACHE[`${owner}/${name}`] ? Promise.resolve({data: CACHE[`${owner}/${name}`]}):  await request(
+            { url: `/repos/${owner}/${name}/labels` },
+            req,
+            res
+        )
+    ])
+
+    const [issuesData, labelsData] = fetchs
 
     return {
         owner,

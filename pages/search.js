@@ -1,10 +1,14 @@
+import { useEffect } from 'react'
 import { Row, Col, List, Pagination } from 'antd'
 import Link from 'next/link'
 import Repo from '../component/Repo'
 import { request } from '../lib/api'
 import { withRouter } from 'next/router'
 import { isValidElement, memo } from 'react'
-import { route } from 'next/dist/next-server/server/router'
+import { cacheArray } from '../lib/repo-basic-cache'
+
+const isServer = typeof window === 'undefined'
+
 const per_page = 10
 const LANGUAGE = ['JavaScript', 'HTML', 'CSS', 'TypeScript', 'Java', 'Python']
 const SORT_TYPE = [
@@ -54,6 +58,11 @@ const FilterLink = memo(({ name, query, lang, sort, order, page }) => {
 
 const Search = ({ repos, router }) => {
     const { lang, sort, order, page } = router.query
+
+    useEffect(() => {
+        !isServer && cacheArray(repos.item)
+    }, [])
+
     return (
         <div className="root">
             <Row gutter={20}>
