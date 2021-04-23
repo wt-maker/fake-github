@@ -5,6 +5,7 @@ import { withRouter } from 'next/router'
 import { GithubOutlined, UserOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
 import { logout } from '../store/store'
+import Container from './Container'
 const { Header, Content, Footer } = Layout
 const { Search } = Input
 
@@ -48,7 +49,7 @@ const MyLayout = ({children, user, logout, router}) => {
     return (
         <Layout>
             <Header>
-                <div className="header-inner">
+                <Container renderer={<div className="header-inner"/>}>
                     <div className="header-left">
                         <div className="logo">
                             <Link href="/">
@@ -82,7 +83,7 @@ const MyLayout = ({children, user, logout, router}) => {
                             )}
                         </div>
                     </div>
-                </div>
+                </Container>
             </Header>
 
             <Content>
@@ -90,7 +91,6 @@ const MyLayout = ({children, user, logout, router}) => {
             </Content>
 
             <Footer>
-                footer
             </Footer>
             <style jsx>{`
                 .header-inner {

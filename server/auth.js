@@ -54,7 +54,6 @@ module.exports = (server) => {
     server.use(async (ctx, next) => {
         const {path, method} = ctx
         if (path == '/logout' && method == 'POST') {
-            console.log('logout')
             ctx.session = null
             ctx.body = 'logout success'
         } else {

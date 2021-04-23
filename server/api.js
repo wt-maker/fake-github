@@ -15,8 +15,6 @@ module.exports = server => {
             if (token) {
                 headers['Authorization'] = `${githubAuth.token_type} ${githubAuth.access_token}`
             }
-
-            console.log('服务器转发请求')
             const result = await requestGithub(method, url, ctx.request.body || {}, headers)
             ctx.status = result.status
             ctx.body = result.data

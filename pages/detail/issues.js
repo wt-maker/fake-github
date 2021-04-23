@@ -249,26 +249,6 @@ Issues.getInitialProps = async (ctx) => {
     let { res, req, query } = ctx.ctx
     let { owner, name } = query
 
-    //issues
-    /* const issuesData = await request(
-        { url: `/repos/${owner}/${name}/issues` },
-        req,
-        res
-    )
-    let labelsData = {data: {}}
-    if (CACHE[`${owner}/${name}`]) {
-        console.log(CACHE[`${owner}/${name}`])
-        console.log('使用缓存')
-        labelsData.data = CACHE[`${owner}/${name}`]
-    } else {
-        console.log('请求数据')
-        labelsData = await request(
-            { url: `/repos/${owner}/${name}/labels` },
-            req,
-            res
-        )
-    } */
-
     const fetchs = await Promise.all([
         await request(
             { url: `/repos/${owner}/${name}/issues` },

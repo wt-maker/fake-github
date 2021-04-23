@@ -66,7 +66,7 @@ const Search = ({ repos, router }) => {
     return (
         <div className="root">
             <Row gutter={20}>
-                <Col span="6">
+                <Col span="4">
                     <List
                         bordered
                         header={<span className="list-header">语言</span>}
@@ -95,7 +95,6 @@ const Search = ({ repos, router }) => {
                         dataSource={SORT_TYPE}
                         renderItem={
                             item => {
-                                console.log(sort, order)
                                 let selected = false
                                 if (item.name === 'Best Match' && !sort) {
                                     selected = true
@@ -116,7 +115,7 @@ const Search = ({ repos, router }) => {
                     >
                     </List>
                 </Col>
-                <Col span="18">
+                <Col span="20">
                     <h2 className="repos-title">{repos.total_count}个仓库</h2>
                     {repos.items.map(repo => <Repo repo={repo} key={repo.id}></Repo>)}
                 </Col>
@@ -136,7 +135,7 @@ const Search = ({ repos, router }) => {
             </Row>
             <style jsx>{`
                 .root {
-                    padding: 20px 0;
+                    padding: 20px 20px;
                 }
                 .list-header {
                     font-weight: 800;
@@ -148,6 +147,9 @@ const Search = ({ repos, router }) => {
                     line-height: 50px;
                 }
                 .pagination {
+                    width: 100%;
+                    display: flex;
+                    flex-direction: row-reverse;
                     padding: 20px;
                     text-align: center;
                 }
@@ -157,7 +159,6 @@ const Search = ({ repos, router }) => {
 }
 
 Search.getInitialProps = async ({ ctx }) => {
-    console.log('test')
     const { query, sort, lang, order, page} = ctx.query
     if (!query) {
         return {

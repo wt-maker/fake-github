@@ -90,14 +90,11 @@ const WithRepoBasic = (Comp, type = 'index') => {
         const full_name = `${query.owner}/${query.name}`
 
         if (get(full_name)) {
-            console.log('使用缓存')
             return {
                 basicRepoInfo: get(full_name),
                 ...pageData
             }
         }
-
-        console.log('请求数据')
         const basicRepoInfo = await request(
             {url: `/repos/${query.owner}/${query.name}`},
             ctx.ctx.req,
